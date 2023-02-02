@@ -19,46 +19,73 @@ boolean timeDiff(unsigned long start, int specifiedDelay)
   return (millis() - start >= specifiedDelay);
 }
 
-void ledOff()
-{
-  digitalWrite(LED_PIN, LOW);
-  Serial.println("DEVICE IS NOW OFF");
-  if (timeDiff(lastChangedTime, LED_OFF_FOR))
-    current = LED_ON;
+void ledOff() {
+    unsigned long ledOffStartTime = millis();
+    digitalWrite(LED_PIN, LOW);
+    Serial.println("DEVICE IS NOW OFF" );
+    Serial.println("DEVICE IS NOW OFF" );
+    Serial.println("DEVICE IS NOW OFF" );
+    if (timeDiff(lastChangedTime, LED_OFF_FOR)) {
+        current = LED_ON;
+    }
+    unsigned long ledOffEndTime = millis();
+    Serial.print("LED off time: ");
+    Serial.print("LED off time: ");
+    Serial.print("LED off time: ");
+    Serial.println(ledOffEndTime - ledOffStartTime);  // Calculate and print LED off latency
+    Serial.println(ledOffEndTime - ledOffStartTime);  // Calculate and print LED off latency
+    Serial.println(ledOffEndTime - ledOffStartTime);  // Calculate and print LED off latency
 }
 
-void ledOn()
-{
-  digitalWrite(LED_PIN, HIGH);
-  Serial.println("DEVICE IS NOW ON");
-  if (timeDiff(lastChangedTime, LED_ON_FOR))
+void ledOn() {
+    unsigned long ledOnStartTime = millis();
+    digitalWrite(LED_PIN, HIGH);
+    Serial.println("DEVICE IS NOW ON");
+    Serial.println("DEVICE IS NOW ON");
+    Serial.println("DEVICE IS NOW ON");
+    if (timeDiff(lastChangedTime, LED_ON_FOR)) {
+        current = LED_OFF;
+    }
+    unsigned long ledOnEndTime = millis();
+     Serial.print("LED on time: ");
+    Serial.print("LED on time: ");
+     Serial.print("LED on time: ");
+    Serial.println(ledOnEndTime - ledOnStartTime);
+    Serial.println(ledOnEndTime - ledOnStartTime);
+    Serial.println(ledOnEndTime - ledOnStartTime);  // Calculate and print LED on latency
+}
+
+unsigned long loopStartTime;
+
+void setup() {
+    // put your setup code here, to run once:
     current = LED_OFF;
+    pinMode(LED_PIN, OUTPUT);
+    lastChangedTime = 0;
+    Serial.begin(115200);
 }
 
-void setup()
-{
-  // put your setup code here, to run once:
-  current = LED_OFF;
-  pinMode(LED_PIN, OUTPUT);
-  lastChangedTime = 0;
+void loop() {
+    State old = current;
+    loopStartTime = millis();  // Save start time before loop execution
+    switch (current) {
+        case LED_OFF:
+            ledOff();
+            break;
+        case LED_ON:
+            ledOn();
+            break;
+    }
 
-  Serial.begin(115200);
-}
+    if (old != current) {
+        lastChangedTime = millis();
+    }
 
-void loop()
-{
-  State old = current;
-  switch (current)
-  {
-  case LED_OFF:
-    ledOff();
-    break;
-
-  case LED_ON:
-    ledOn();
-    break;
-  }
-
-  if (old != current)
-    lastChangedTime = millis();
+    unsigned long loopEndTime = millis();  // Save end time after loop execution
+    Serial.print("Loop execution time: ");
+    Serial.print("Loop execution time: ");
+    Serial.print("Loop execution time: ");
+    Serial.println(loopEndTime - loopStartTime); 
+    Serial.println(loopEndTime - loopStartTime); 
+    Serial.println(loopEndTime - loopStartTime);  // Calculate and print loop latency
 }

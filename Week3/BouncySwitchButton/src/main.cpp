@@ -1,17 +1,30 @@
 #include <Arduino.h>
 
-enum class LEDState
+enum ButtonState
 {
     ON,
     OFF
 };
 
-LEDState current;
+ButtonState btnCurrent;
 
 const int LED_PIN = 13;
 const int SWITCH_PIN = 2;
 const int LED_DELAY = 1000;
-long lastChangedTime = 0;
+unsigned long NumberOfCounts;
+
+void ledSwap()
+{
+    digitalWrite(LED_PIN, !digitalRead(LED_PIN));
+}
+
+ButtonState getButtonState () {
+    if (digitalRead(SWITCH_PIN))
+    return ON;
+    else
+    return OFF;
+}
+
 
 void setup()
 {
@@ -19,7 +32,7 @@ void setup()
     Serial.begin(115200);
     pinMode(LED_PIN, OUTPUT);
     pinMode(SWITCH_PIN, INPUT);
-    current = LEDState::OFF;
+    btnCurrent = ButtonState::OFF;
 }
 
 // returns true if specifiedDelay has elapsed since start (millis() values)
@@ -42,8 +55,8 @@ void ledOff()
     digitalWrite(LED_PIN, LOW);
     int delay = getLEDDelay();
     Serial.printf("LED off ");
-    if (timeDiff(lastChangedTime, delay))
-        current = LEDState::ON;
+    if (timeDiff(btnPresses, delay))
+        btnCurrent = ButtonState::ON;
 }
 
 void ledOn()
@@ -51,25 +64,27 @@ void ledOn()
     digitalWrite(LED_PIN, HIGH);
     int delay = getLEDDelay();
     Serial.printf("LED on ");
-    if (timeDiff(lastChangedTime, delay))
-        current = LEDState::OFF;
+    Serial.printf("Number of counts ", btnPresses);
+    if (timeDiff(btnPresses, delay))
+        btnCurrent = ButtonState::OFF;
 }
 
 void loop()
 {
-    LEDState old = current;
+    ButtonState now = getButtonState();
     // Save start time before loop execution
-    switch (current)
+    btnCurrent = now;
+    switch (btnCurrent)
     {
-    case LEDState::OFF:
-        ledOff();
+    case ON:
+    btnPresses++;
         break;
-    case LEDState::ON:
-        ledOn();
+    case OFF:
         break;
     }
 
-    if (old != current)
-        lastChangedTime = millis();
-    
+    if (btnPresses == 1) {
+        btnPresses = 0;
+        ledSwap();
+    }
 } 

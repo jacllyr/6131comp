@@ -1,30 +1,17 @@
 #include <Arduino.h>
 
-enum ButtonState
+enum class LEDState
 {
     ON,
     OFF
 };
 
-ButtonState btnCurrent;
+LEDState current;
 
 const int LED_PIN = 13;
 const int SWITCH_PIN = 2;
 const int LED_DELAY = 1000;
-unsigned long NumberOfCounts;
-
-void ledSwap()
-{
-    digitalWrite(LED_PIN, !digitalRead(LED_PIN));
-}
-
-ButtonState getButtonState () {
-    if (digitalRead(SWITCH_PIN))
-    return ON;
-    else
-    return OFF;
-}
-
+long lastChangedTime = 0;
 
 void setup()
 {
@@ -32,7 +19,7 @@ void setup()
     Serial.begin(115200);
     pinMode(LED_PIN, OUTPUT);
     pinMode(SWITCH_PIN, INPUT);
-    btnCurrent = ButtonState::OFF;
+    current = LEDState::OFF;
 }
 
 // returns true if specifiedDelay has elapsed since start (millis() values)
@@ -46,7 +33,7 @@ int getLEDDelay()
 
     int delay = LED_DELAY;
     if (digitalRead(SWITCH_PIN) == HIGH)
-        delay /= 2;
+        delay /= 6;
     return delay;
 }
 
@@ -54,9 +41,9 @@ void ledOff()
 {
     digitalWrite(LED_PIN, LOW);
     int delay = getLEDDelay();
-    Serial.printf("LED off ");
-    if (timeDiff(btnPresses, delay))
-        btnCurrent = ButtonState::ON;
+    Serial.println("LED off ");
+    if (timeDiff(lastChangedTime, delay))
+        current = LEDState::ON;
 }
 
 void ledOn()
@@ -64,27 +51,25 @@ void ledOn()
     digitalWrite(LED_PIN, HIGH);
     int delay = getLEDDelay();
     Serial.printf("LED on ");
-    Serial.printf("Number of counts ", btnPresses);
-    if (timeDiff(btnPresses, delay))
-        btnCurrent = ButtonState::OFF;
+    if (timeDiff(lastChangedTime, delay))
+        current = LEDState::OFF;
 }
 
 void loop()
 {
-    ButtonState now = getButtonState();
+    LEDState old = current;
     // Save start time before loop execution
-    btnCurrent = now;
-    switch (btnCurrent)
+    switch (current)
     {
-    case ON:
-    btnPresses++;
+    case LEDState::OFF:
+        ledOff();
         break;
-    case OFF:
+    case LEDState::ON:
+        ledOn();
         break;
     }
 
-    if (btnPresses == 1) {
-        btnPresses = 0;
-        ledSwap();
-    }
+    if (old != current)
+        lastChangedTime = millis();
+    
 } 

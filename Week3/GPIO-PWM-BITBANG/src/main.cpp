@@ -22,7 +22,7 @@ unsigned long lastChangeTime;
 LEDState ledCheckUpdate(LEDState currentState, int duty)
 {
     int delayValue = duty * 100;
-    int delayValueOff = 1000 - duty;
+    int delayValueOff = 100 - duty;
 
     if (currentState == LEDState::ON && usTimeDiff(lastChangeTime, delayValue))
         currentState = LEDState::OFF;

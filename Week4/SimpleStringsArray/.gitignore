@@ -1,0 +1,6 @@
+/Release/
+/sloeber.ino.cpp
+/.pio/build/
+/.pio/libdeps/
+/.vscode/
+spec.d

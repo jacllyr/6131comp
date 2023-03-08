@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"name": "GPI0",
+			"path": "6131comp/Week3/GPI0"
+		},
+		{
+			"name": "BouncySwitchButton",
+			"path": "6131comp/Week3/BouncySwitchButton"
+		}
+	],
+	"settings": {}
+}
